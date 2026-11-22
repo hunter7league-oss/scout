@@ -10,6 +10,7 @@ Modes:
 """
 from __future__ import annotations
 
+import json
 import os
 import smtplib
 import sys
@@ -64,6 +65,13 @@ def alert_owner(subject: str, text: str) -> None:
 
 
 # ---------- orders ----------
+def plain(obj) -> dict:
+    """Turn a Stripe object into plain nested dicts (newer SDKs drop dict methods)."""
+    if isinstance(obj, dict) and not hasattr(obj, "to_dict"):
+        return obj
+    return json.loads(str(obj))
+
+
 def custom_fields(session) -> dict:
     """Map Stripe custom fields to work/state/certification.
 
@@ -130,6 +138,7 @@ def process_orders() -> int:
     for s in stripe.checkout.Session.list(payment_link=link, status="complete",
                                           created={"gte": since}, limit=100,
                                           expand=["data.payment_intent"]).auto_paging_iter():
+        s = plain(s)
         if s.get("payment_status") != "paid" or not s.get("payment_intent"):
             continue
         pi = s["payment_intent"]
