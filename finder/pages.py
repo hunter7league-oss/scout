@@ -131,8 +131,8 @@ with each firm's award history and where to find its contacts. Delivered by emai
 <a class="cta" href="{BUY}">Get a custom shortlist · $49</a><br>
 <span class="fine">Full refund if we find fewer than 5 firms. <a href="/sample.html">See a sample report</a>.</span></div>"""
     body = f"""<h1>Small-business federal contractors in {e(label)} (NAICS {code})</h1>
-<p class="lead">The small businesses that won the most federal contracts under NAICS {code} in the last five years,
-ranked by number of awards. Use it to find teaming partners and subcontractors for your next bid.
+<p class="lead">Small businesses behind the largest federal contract awards under NAICS {code} in the last five
+years, ranked by how many of those awards they won. Use it to find teaming partners and subcontractors for your next bid.
 Updated {updated}.</p>
 {cta}
 <table><thead><tr><th>#</th><th>Firm</th><th class="num">Awards</th><th class="num">Total obligated</th>
@@ -150,7 +150,7 @@ def index_page(built: dict[str, str], updated: str) -> str:
     items = "".join(f'<li><a href="/industries/{c}.html">{html.escape(l)}</a> <span class="fine">{c}</span></li>'
                     for c, l in sorted(built.items(), key=lambda kv: kv[1]))
     body = f"""<h1>Find federal teaming partners by industry</h1>
-<p class="lead">Free lists of the small businesses winning federal contracts in each industry, from public
+<p class="lead">Free lists of small businesses winning large federal contracts in each industry, from public
 USAspending.gov data. Updated {updated}.</p>
 <ul class="cols">{items}</ul>
 <div class="box">Need partners for a specific bid, state or certification?
