@@ -68,3 +68,11 @@ def test_clean_and_agency_order():
     rows = [{"Recipient Name": "X", "Award Amount": 1, "Awarding Agency": a} for a in
             ["Department of the Interior", "Environmental Protection Agency", "Environmental Protection Agency"]]
     assert usaspending.rank_firms(rows)[0]["agencies"][0] == "Environmental Protection Agency"
+
+
+def test_claude_failure_does_not_look_like_no_match(monkeypatch):
+    import pytest
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    with pytest.raises(RuntimeError):
+        report.work_to_naics("soil cleanup")
+    assert report.work_to_naics("soil cleanup 562910") == ["562910"]

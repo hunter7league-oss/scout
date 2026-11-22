@@ -21,9 +21,12 @@ def _client():
     return anthropic.Anthropic()
 
 
-def _ask(prompt: str, max_tokens: int = 800) -> str | None:
+def _ask(prompt: str, max_tokens: int = 800, strict: bool = False) -> str | None:
+    """Call Claude. With strict=True, a missing key or failed call raises instead of returning None."""
     client = _client()
     if client is None:
+        if strict:
+            raise RuntimeError("ANTHROPIC_API_KEY is not set")
         return None
     try:
         msg = client.messages.create(model=MODEL, max_tokens=max_tokens,
@@ -31,6 +34,8 @@ def _ask(prompt: str, max_tokens: int = 800) -> str | None:
         return "".join(b.text for b in msg.content if getattr(b, "type", "") == "text").strip()
     except Exception as exc:  # report still goes out without AI notes
         print(f"[warn] Claude call failed: {exc}")
+        if strict:
+            raise
         return None
 
 
@@ -41,7 +46,8 @@ def work_to_naics(work: str) -> list[str]:
         return typed[:3]
     answer = _ask(
         "Return ONLY a JSON list of up to 3 six-digit 2022 NAICS codes that best match "
-        f"this description of federal contract work: {work!r}"
+        f"this description of federal contract work: {work!r}",
+        strict=True,  # a Claude outage must retry the order, never refund it
     )
     codes = re.findall(r"\b\d{6}\b", answer or "")
     return codes[:3]
