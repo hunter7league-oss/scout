@@ -1,0 +1,63 @@
+name: Process orders
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # every 15 minutes (GitHub may delay runs a few minutes)
+  workflow_dispatch:
+    inputs:
+      sample_work:
+        description: "Make a sample report instead (e.g. 'environmental remediation 562910'). Leave blank to process orders."
+        required: false
+      sample_state:
+        description: "Two-letter state for the sample (optional)"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orders
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
+      STRIPE_PAYMENT_LINK_ID: ${{ secrets.STRIPE_PAYMENT_LINK_ID }}
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASS: ${{ secrets.SMTP_PASS }}
+      OWNER_EMAIL: ${{ secrets.OWNER_EMAIL }}
+      HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
+      SMTP_HOST: ${{ vars.SMTP_HOST }}
+      SMTP_PORT: ${{ vars.SMTP_PORT }}
+      FROM_EMAIL: ${{ vars.FROM_EMAIL }}
+      BUSINESS_NAME: ${{ vars.BUSINESS_NAME }}
+      BUSINESS_ADDRESS: ${{ vars.BUSINESS_ADDRESS }}
+      AUTO_REFUND: ${{ vars.AUTO_REFUND }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Process paid orders
+        if: ${{ !inputs.sample_work }}
+        run: python -m finder.main
+
+      - name: Build sample report
+        if: ${{ inputs.sample_work }}
+        env:
+          SAMPLE_WORK: ${{ inputs.sample_work }}
+          SAMPLE_STATE: ${{ inputs.sample_state }}
+        run: |
+          python -m finder.main --sample "$SAMPLE_WORK" "$SAMPLE_STATE"
+          git config user.name "teamingscout-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/sample.html
+          git commit -m "Update sample report" || echo "No change"
+          git push
