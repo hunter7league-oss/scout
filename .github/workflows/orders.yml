@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || secrets.NTHROPIC_API_KEY }}
       STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
       STRIPE_PAYMENT_LINK_ID: ${{ secrets.STRIPE_PAYMENT_LINK_ID }}
       SMTP_USER: ${{ secrets.SMTP_USER }}
