@@ -136,6 +136,7 @@ def process_orders() -> int:
     # only means replacing STRIPE_KEY.
     if stripe.api_key.startswith(("rk_live_", "sk_live_")) and os.environ.get("STRIPE_PAYMENT_LINK_ID_LIVE"):
         link = os.environ["STRIPE_PAYMENT_LINK_ID_LIVE"]
+    print(f"Stripe mode: {'LIVE' if '_live_' in stripe.api_key else 'TEST'}")
     since = int(time.time()) - 7 * 24 * 3600
     handled = 0
 
