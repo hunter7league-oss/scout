@@ -191,6 +191,9 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--sample":
         make_sample(sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else None)
         sys.exit(0)
+    if not os.environ.get("STRIPE_KEY"):
+        print("Not configured yet: add the STRIPE_KEY secret to start processing orders.")
+        sys.exit(0)
     try:
         print(f"Handled {process_orders()} order(s)")
         ping()
