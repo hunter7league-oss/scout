@@ -61,3 +61,10 @@ def test_dashboard_style_fields():
     ]}
     o = main.parse_order(session)
     assert o["work"] == "drone mapping" and o["state"] is None and o["cert"] == "Woman-owned"
+
+
+def test_clean_and_agency_order():
+    assert usaspending._clean("IGF::OT::IGF REMEDIAL ACTION") == "REMEDIAL ACTION"
+    rows = [{"Recipient Name": "X", "Award Amount": 1, "Awarding Agency": a} for a in
+            ["Department of the Interior", "Environmental Protection Agency", "Environmental Protection Agency"]]
+    assert usaspending.rank_firms(rows)[0]["agencies"][0] == "Environmental Protection Agency"

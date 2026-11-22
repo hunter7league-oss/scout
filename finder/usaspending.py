@@ -7,7 +7,8 @@ from __future__ import annotations
 
 import datetime as dt
 import time
-from collections import defaultdict
+import re
+from collections import Counter, defaultdict
 
 import requests
 
@@ -75,9 +76,15 @@ def search_awards(naics: list[str], state: str | None, certification: str | None
     return rows
 
 
+def _clean(desc: str | None) -> str:
+    """Strip procurement-system prefixes such as 'IGF::OT::IGF' from award descriptions."""
+    text = re.sub(r"^(?:IGF::\w+::IGF\s*)+", "", (desc or "").strip())
+    return text.strip(" -:")
+
+
 def rank_firms(rows: list[dict], top: int = 10) -> list[dict]:
     """Group awards by firm; rank by number of awards, then total value."""
-    firms: dict[str, dict] = defaultdict(lambda: {"awards": [], "agencies": set(), "states": set()})
+    firms: dict[str, dict] = defaultdict(lambda: {"awards": [], "agencies": Counter(), "states": set()})
     for r in rows:
         name = (r.get("Recipient Name") or "").strip()
         if not name or name.upper() in {"MULTIPLE RECIPIENTS", "REDACTED DUE TO PII"}:
@@ -87,7 +94,7 @@ def rank_firms(rows: list[dict], top: int = 10) -> list[dict]:
         f["recipient_id"] = r.get("recipient_id")
         f["awards"].append(r)
         if r.get("Awarding Agency"):
-            f["agencies"].add(r["Awarding Agency"])
+            f["agencies"][r["Awarding Agency"]] += 1
         if r.get("Place of Performance State Code"):
             f["states"].add(r["Place of Performance State Code"])
 
@@ -102,9 +109,9 @@ def rank_firms(rows: list[dict], top: int = 10) -> list[dict]:
             "award_count": len(f["awards"]),
             "total": sum(amounts),
             "largest": max(amounts) if amounts else 0,
-            "largest_desc": (best.get("Description") or "").strip()[:200],
+            "largest_desc": _clean(best.get("Description"))[:200],
             "latest_end": ends[-1] if ends else "",
-            "agencies": sorted(f["agencies"])[:3],
+            "agencies": [a for a, _ in f["agencies"].most_common(3)],
             "states": sorted(f["states"])[:5],
             "profile_url": (f"https://www.usaspending.gov/recipient/{f['recipient_id']}/latest"
                             if f["recipient_id"] else None),
