@@ -76,3 +76,10 @@ def test_claude_failure_does_not_look_like_no_match(monkeypatch):
     with pytest.raises(RuntimeError):
         report.work_to_naics("soil cleanup")
     assert report.work_to_naics("soil cleanup 562910") == ["562910"]
+
+
+def test_industry_page_renders():
+    from finder import pages
+    firms = usaspending.rank_firms(ROWS)
+    out = pages.industry_page("562910", "Environmental Remediation Services", firms, "November 22, 2026")
+    assert "NAICS 562910" in out and "Firm A" in out and "buy.stripe.com" in out and "canonical" in out
