@@ -132,6 +132,10 @@ def process_orders() -> int:
     import stripe
     stripe.api_key = env("STRIPE_KEY")
     link = env("STRIPE_PAYMENT_LINK_ID")
+    # A live key automatically uses the live payment link, so switching to live mode
+    # only means replacing STRIPE_KEY.
+    if stripe.api_key.startswith(("rk_live_", "sk_live_")) and os.environ.get("STRIPE_PAYMENT_LINK_ID_LIVE"):
+        link = os.environ["STRIPE_PAYMENT_LINK_ID_LIVE"]
     since = int(time.time()) - 7 * 24 * 3600
     handled = 0
 
