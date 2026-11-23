@@ -1,0 +1,40 @@
+name: APEX outreach
+
+on:
+  schedule:
+    - cron: "23 15 * * 1-5"   # weekdays ~10:23 a.m. Eastern
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: outreach
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASS: ${{ secrets.SMTP_PASS }}
+      SMTP_HOST: ${{ vars.SMTP_HOST }}
+      SMTP_PORT: ${{ vars.SMTP_PORT }}
+      FROM_EMAIL: ${{ vars.FROM_EMAIL }}
+      BUSINESS_ADDRESS: ${{ vars.BUSINESS_ADDRESS }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Send today's batch
+        run: python -m finder.outreach
+      - name: Save progress
+        if: always()
+        run: |
+          git config user.name "teamingscout-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add outreach
+          git commit -m "Outreach progress" || echo "No change"
+          git push
