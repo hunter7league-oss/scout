@@ -48,7 +48,7 @@ jobs:
             echo "::group::Check $i at $(date -u +%H:%M)"
             python -m finder.main || echo "Run failed; the owner was alerted. Continuing."
             echo "::endgroup::"
-            [ "$i" -lt 32 ] && sleep 600
+            if [ "$i" -lt 32 ]; then sleep 600; fi
           done
       - name: Start the next run
         if: always()
