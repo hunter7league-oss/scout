@@ -3,73 +3,266 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TeamingScout · Find federal teaming partners in an hour</title>
-<meta name="description" content="A shortlist of firms that have won federal contracts for the work you're bidding on, with award history and contact links. $49, delivered by email.">
+<title>TeamingScout: find federal teaming partners in about an hour</title>
+<meta name="description" content="Describe the federal contract you're bidding on and get a ranked shortlist of 5 to 10 firms that have won the same kind of work, with award history and contact links. $49, delivered by email.">
+<link rel="canonical" href="https://teamingscout.com/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
 <style>
-  :root { --ink:#14202b; --muted:#5b6670; --line:#e3e6e8; --accent:#1f6f5c; --bg:#fbfaf7; }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:Georgia, 'Times New Roman', serif; color:var(--ink); background:var(--bg); line-height:1.55; }
-  .wrap { max-width:760px; margin:0 auto; padding:0 24px; }
-  header { padding:28px 0 0; font-family:Arial, sans-serif; font-weight:700; letter-spacing:.02em; }
-  h1 { font-size:42px; line-height:1.15; margin:56px 0 16px; font-weight:400; }
-  .lead { font-size:20px; color:var(--muted); max-width:620px; }
-  .cta { display:inline-block; margin:28px 0 8px; padding:14px 26px; background:var(--accent); color:#fff;
-         text-decoration:none; font-family:Arial, sans-serif; font-weight:700; border-radius:6px; }
-  .cta:hover { filter:brightness(1.1); }
-  .fine { font-family:Arial, sans-serif; font-size:13px; color:var(--muted); }
-  section { border-top:1px solid var(--line); margin-top:56px; padding-top:32px; }
-  h2 { font-size:24px; font-weight:400; margin:0 0 16px; }
-  ol, ul { padding-left:20px; } li { margin-bottom:10px; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; font-family:Arial, sans-serif; }
-  .grid div { border:1px solid var(--line); border-radius:8px; padding:16px; background:#fff; }
-  .grid b { display:block; margin-bottom:6px; }
-  footer { margin:64px 0 40px; font-family:Arial, sans-serif; font-size:12px; color:var(--muted); }
-  a { color:var(--accent); }
+  :root {
+    --paper: #F6F8FA;
+    --sheet: #FFFFFF;
+    --ink: #14284B;
+    --ink-deep: #0E1D38;
+    --muted: #51627A;
+    --rule: #B9C7DA;
+    --rule-soft: #DCE4EE;
+    --stamp: #B42318;
+    --focus: #F2B33D;
+    --measure: 34rem;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--ink);
+    background: var(--paper);
+  }
+  a { color: var(--ink); text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible, summary:focus-visible {
+    outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 4px;
+  }
+  .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.5rem; }
+
+  /* Top bar */
+  .top { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 0; }
+  .brand { font-weight: 800; font-size: 1.15rem; letter-spacing: -0.01em; text-decoration: none; }
+  .brand span { font-weight: 500; color: var(--muted); }
+  .top nav a { font-size: 0.95rem; color: var(--muted); margin-left: 1.25rem; }
+
+  /* Hero */
+  .hero {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 3.5rem; align-items: center; padding: 3rem 0 4.5rem;
+  }
+  h1 {
+    font-size: clamp(2.2rem, 4.6vw, 3.5rem); line-height: 1.06; letter-spacing: -0.025em;
+    font-weight: 800; margin: 0 0 1.25rem; max-width: 14ch;
+  }
+  .lead { font-size: 1.2rem; color: var(--muted); max-width: var(--measure); margin: 0 0 2rem; }
+  .buy {
+    display: inline-block; background: var(--ink); color: #fff; text-decoration: none;
+    font-weight: 600; font-size: 1.1rem; padding: 0.95rem 1.6rem; border-radius: 6px;
+  }
+  .buy:hover { background: var(--ink-deep); }
+  .assure { font-size: 0.92rem; color: var(--muted); margin: 0.9rem 0 0; max-width: var(--measure); }
+
+  /* The award sheet: the one memorable element */
+  .sheet {
+    position: relative; background: var(--sheet); border: 1px solid var(--rule);
+    border-radius: 4px; padding: 1.5rem 1.5rem 1.25rem;
+    box-shadow: 0 1px 0 var(--rule-soft), 0 18px 40px -24px rgba(20, 40, 75, 0.35);
+  }
+  .sheet-head { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline;
+    border-bottom: 2px solid var(--ink); padding-bottom: 0.75rem; margin-bottom: 0.25rem; }
+  .sheet-head strong { font-size: 1rem; }
+  .sheet-head span { font-size: 0.85rem; color: var(--muted); text-align: right; }
+  .row { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: 0.25rem 0.75rem;
+    padding: 0.9rem 0; border-bottom: 1px solid var(--rule-soft); }
+  .row:last-of-type { border-bottom: 0; }
+  .rank { font-weight: 800; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .firm { font-weight: 600; font-size: 0.98rem; line-height: 1.3; }
+  .meta { grid-column: 2 / 4; display: flex; flex-wrap: wrap; gap: 0.35rem 1.25rem; font-size: 0.85rem; color: var(--muted); }
+  .meta b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .awards { font-weight: 800; font-size: 1.35rem; font-variant-numeric: tabular-nums; text-align: right; line-height: 1; }
+  .awards small { display: block; font-size: 0.72rem; font-weight: 500; color: var(--muted); margin-top: 0.2rem; }
+  .sheet-foot { font-size: 0.82rem; color: var(--muted); margin: 0.75rem 0 0; }
+  .stamp {
+    position: absolute; right: -0.75rem; top: -1.35rem; transform: rotate(-6deg);
+    border: 3px solid var(--stamp); color: var(--stamp); border-radius: 6px;
+    padding: 0.35rem 0.75rem; font-weight: 800; font-size: 0.95rem; line-height: 1.15;
+    background: rgba(255, 255, 255, 0.9); text-align: center;
+    animation: stamp 0.45s cubic-bezier(.2, .9, .3, 1.3) 0.5s both;
+  }
+  @keyframes stamp { from { opacity: 0; transform: rotate(-6deg) scale(1.6); } to { opacity: 1; transform: rotate(-6deg) scale(1); } }
+  @media (prefers-reduced-motion: reduce) { .stamp { animation: none; } }
+
+  /* Sections */
+  section.band { padding: 4rem 0; border-top: 1px solid var(--rule-soft); }
+  h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); line-height: 1.15; letter-spacing: -0.02em; font-weight: 800; margin: 0 0 1.75rem; max-width: 22ch; }
+
+  .steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; counter-reset: step; }
+  .steps li { counter-increment: step; border-top: 2px solid var(--ink); padding-top: 1rem; }
+  .steps li::before { content: counter(step); display: block; font-weight: 800; font-size: 2.25rem; line-height: 1; margin-bottom: 0.6rem; }
+  .steps h3, .fields h3 { font-size: 1.1rem; margin: 0 0 0.4rem; }
+  .steps p, .fields p { margin: 0; color: var(--muted); }
+
+  .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border: 1px solid var(--rule); background: var(--sheet); border-radius: 4px; }
+  .fields div { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--rule-soft); }
+  .fields div:nth-child(odd) { border-right: 1px solid var(--rule-soft); }
+  .fields div:nth-last-child(-n+2) { border-bottom: 0; }
+
+  .industries { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0 0 1.25rem; padding: 0; list-style: none; }
+  .industries a { display: inline-block; padding: 0.55rem 0.95rem; border: 1px solid var(--rule); border-radius: 999px; background: var(--sheet); text-decoration: none; font-size: 0.95rem; }
+  .industries a:hover { border-color: var(--ink); }
+  .note { color: var(--muted); max-width: var(--measure); }
+
+  details { border-bottom: 1px solid var(--rule-soft); max-width: 46rem; }
+  summary { cursor: pointer; font-weight: 600; padding: 1rem 0; list-style: none; display: flex; justify-content: space-between; gap: 1rem; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-weight: 800; color: var(--muted); }
+  details[open] summary::after { content: "−"; }
+  details p { margin: 0 0 1rem; color: var(--muted); max-width: var(--measure); }
+
+  .closing { text-align: left; padding: 4rem 0; border-top: 1px solid var(--rule-soft); }
+  footer { padding: 2rem 0 3rem; font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--rule-soft); }
+  footer p { max-width: 46rem; margin: 0 0 0.5rem; }
+
+  .mobile-buy { display: none; }
+
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; gap: 3rem; padding: 1.5rem 0 3rem; }
+    .steps { grid-template-columns: 1fr; gap: 1.75rem; }
+    .fields { grid-template-columns: 1fr; }
+    .fields div:nth-child(odd) { border-right: 0; }
+    .fields div:nth-last-child(2) { border-bottom: 1px solid var(--rule-soft); }
+    .top nav a:not(:last-child) { display: none; }
+    .stamp { right: 0.5rem; top: -1.5rem; font-size: 0.85rem; }
+    body { padding-bottom: 5rem; }
+    .mobile-buy {
+      display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+      padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+      background: var(--sheet); border-top: 1px solid var(--rule); align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .mobile-buy span { font-size: 0.88rem; color: var(--muted); line-height: 1.3; }
+    .mobile-buy .buy { padding: 0.75rem 1.15rem; font-size: 1rem; white-space: nowrap; }
+  }
+  @media (max-width: 420px) {
+    .sheet { padding: 1.25rem 1rem 1rem; }
+    .awards { font-size: 1.15rem; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>TeamingScout</header>
+  <header class="top">
+    <a class="brand" href="/">TeamingScout</a>
+    <nav aria-label="Main">
+      <a href="#how">How it works</a>
+      <a href="/industries/">Free industry lists</a>
+    </nav>
+  </header>
 
-  <h1>Find a teaming partner for your next federal bid, in an hour.</h1>
-  <p class="lead">Tell us the work you're bidding on. We search five years of federal contract awards and email you
-    a ranked shortlist of firms that have done that exact work, with their award history and where to find their contacts.</p>
-  <a class="cta" href="https://buy.stripe.com/eVq28tbnTcFy1Ig27O08g00">Get my shortlist · $49</a>
-  <p class="fine">Delivered by email, usually within an hour. Full refund if we find fewer than 5 firms.</p>
+  <main>
+    <section class="hero">
+      <div>
+        <h1>See who already wins the work you're bidding on.</h1>
+        <p class="lead">Describe your federal bid. Within about an hour you get a ranked shortlist of 5 to 10 firms that have won contracts for the same work, with their award history and where to reach them.</p>
+        <a class="buy" href="https://buy.stripe.com/eVq28tbnTcFy1Ig27O08g00">Get my shortlist for $49</a>
+        <p class="assure">Filter by state and certification: small business, woman-owned, service-disabled veteran-owned, 8(a) or HUBZone. Full refund if we find fewer than 5 firms.</p>
+      </div>
 
-  <section>
-    <h2>What you get</h2>
-    <div class="grid">
-      <div><b>5–10 ranked firms</b>Firms with federal awards under the same industry code, filtered by state and certification if you ask.</div>
-      <div><b>Their track record</b>Number of awards, total and largest award, agencies served, and when their current work ends.</div>
-      <div><b>Where to reach them</b>Links to each firm's public award history and its SAM.gov listing with points of contact.</div>
-    </div>
-    <p class="fine" style="margin-top:16px"><a href="sample.html">See a sample report</a> built from real public data,
-      or <a href="/industries/">browse free partner lists by industry</a>.</p>
-  </section>
+      <figure class="sheet" aria-labelledby="sheet-caption" style="margin:0">
+        <div class="stamp" aria-hidden="true">Real data,<br>public records</div>
+        <div class="sheet-head">
+          <strong>Partner shortlist</strong>
+          <span>Environmental remediation<br>NAICS 562910</span>
+        </div>
+        <div class="row">
+          <span class="rank">1</span>
+          <span class="firm">HydroGeoLogic, Inc.</span>
+          <span class="awards">26<small>awards</small></span>
+          <span class="meta"><span><b>$758.1M</b> total</span><span>Defense, EPA</span><span>Work through <b>2031</b></span></span>
+        </div>
+        <div class="row">
+          <span class="rank">2</span>
+          <span class="firm">EA Engineering, Science, and Technology</span>
+          <span class="awards">18<small>awards</small></span>
+          <span class="meta"><span><b>$534.7M</b> total</span><span>EPA, Defense</span><span>Work through <b>2034</b></span></span>
+        </div>
+        <div class="row">
+          <span class="rank">3</span>
+          <span class="firm">Sevenson Environmental Services</span>
+          <span class="awards">16<small>awards</small></span>
+          <span class="meta"><span><b>$836.6M</b> total</span><span>Defense, EPA</span><span>Work through <b>2032</b></span></span>
+        </div>
+        <figcaption id="sheet-caption" class="sheet-foot">The top 3 of 10 firms from a real report. <a href="/sample.html">See the full sample</a>.</figcaption>
+      </figure>
+    </section>
 
-  <section>
-    <h2>How it works</h2>
-    <ol>
-      <li>Pay through Stripe and describe the work (or give the NAICS code), the state, and any certification you need in a partner.</li>
-      <li>We search USAspending.gov award records and rank the firms by relevant experience.</li>
-      <li>Your shortlist arrives by email. Reply with any question.</li>
-    </ol>
-  </section>
+    <section class="band" id="how">
+      <h2>From bid to shortlist in three steps</h2>
+      <ol class="steps">
+        <li><h3>Describe the work</h3><p>Type what you're bidding on in plain words, or give the NAICS code. Add a state or certification if you need one.</p></li>
+        <li><h3>We search five years of awards</h3><p>Federal contract awards for that work on USAspending.gov, with firms ranked by how often they've won.</p></li>
+        <li><h3>Your shortlist arrives by email</h3><p>Usually within an hour. Reach out to the firms that fit, with their track record in hand.</p></li>
+      </ol>
+    </section>
 
-  <section>
-    <h2>Good to know</h2>
-    <ul>
-      <li>Every figure comes from public USAspending.gov records; nothing is estimated.</li>
-      <li>Being on the list means a firm has done similar work, not that it is available or interested.</li>
-      <li>We don't contact firms on your behalf. You reach out directly.</li>
-    </ul>
-  </section>
+    <section class="band">
+      <h2>What you get for each firm</h2>
+      <div class="fields">
+        <div><h3>Award count and totals</h3><p>How many contracts they've won for this work, the total value and their largest award.</p></div>
+        <div><h3>Which agencies buy from them</h3><p>Know whether they already work with the agency you're bidding to.</p></div>
+        <div><h3>When their contracts end</h3><p>Current work ending soon can mean capacity, or a recompete worth teaming on.</p></div>
+        <div><h3>Where to reach them</h3><p>Links to each firm's award history and its SAM.gov listing with points of contact.</p></div>
+      </div>
+    </section>
+
+    <section class="band">
+      <h2>Free partner lists by industry</h2>
+      <ul class="industries">
+        <li><a href="/industries/541512.html">Computer systems design</a></li>
+        <li><a href="/industries/541330.html">Engineering services</a></li>
+        <li><a href="/industries/236220.html">Commercial building construction</a></li>
+        <li><a href="/industries/561720.html">Janitorial services</a></li>
+        <li><a href="/industries/541611.html">Management consulting</a></li>
+        <li><a href="/industries/562910.html">Environmental remediation</a></li>
+        <li><a href="/industries/561612.html">Security guards</a></li>
+        <li><a href="/industries/238210.html">Electrical contractors</a></li>
+      </ul>
+      <p class="note">Small businesses winning the largest federal awards in 41 industries, updated every week. <a href="/industries/">See all industries</a>.</p>
+    </section>
+
+    <section class="band">
+      <h2>Questions</h2>
+      <details>
+        <summary>Where does the data come from?</summary>
+        <p>USAspending.gov, the official public record of federal spending. Every name and figure in your report comes straight from those award records.</p>
+      </details>
+      <details>
+        <summary>What if you can't find enough firms?</summary>
+        <p>If fewer than 5 firms match your request, you get a full refund automatically, by email.</p>
+      </details>
+      <details>
+        <summary>Do you contact the firms for me?</summary>
+        <p>No. You reach out directly, using the SAM.gov contact link included for each firm.</p>
+      </details>
+      <details>
+        <summary>How fast is delivery?</summary>
+        <p>Orders are checked every 10 minutes, so most reports arrive well within an hour. Check your spam folder if it hasn't arrived.</p>
+      </details>
+    </section>
+
+    <section class="closing">
+      <h2>Your next bid needs the right partner.</h2>
+      <a class="buy" href="https://buy.stripe.com/eVq28tbnTcFy1Ig27O08g00">Get my shortlist for $49</a>
+    </section>
+  </main>
 
   <footer>
-    TeamingScout is independent and not affiliated with any government agency.
-    Questions: <a href="mailto:reports@teamingscout.com">reports@teamingscout.com</a> · BUSINESS_ADDRESS
+    <p>TeamingScout is independent and not affiliated with any government agency. Being listed means a firm has done similar federal work, not that it is available or interested.</p>
+    <p>Questions: <a href="mailto:reports@teamingscout.com">reports@teamingscout.com</a></p>
   </footer>
+</div>
+
+<div class="mobile-buy">
+  <span>Partner shortlist in about an hour</span>
+  <a class="buy" href="https://buy.stripe.com/eVq28tbnTcFy1Ig27O08g00">Get it for $49</a>
 </div>
 </body>
 </html>
