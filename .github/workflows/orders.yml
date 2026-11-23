@@ -1,8 +1,6 @@
-name: Process orders
+name: Process orders (manual)
 
 on:
-  schedule:
-    - cron: "*/15 * * * *"   # every 15 minutes (GitHub may delay runs a few minutes)
   workflow_dispatch:
     inputs:
       sample_work:

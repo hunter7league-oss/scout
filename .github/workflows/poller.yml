@@ -1,0 +1,57 @@
+name: Order poller
+
+# Checks for new orders every 10 minutes for ~5.5 hours, then starts its own next run.
+# GitHub's own schedules can be delayed by hours on new repositories, so this chain keeps
+# delivery fast. The hourly schedule below only restarts the chain if it ever stops.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "41 * * * *"
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: order-poller
+  cancel-in-progress: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || secrets.NTHROPIC_API_KEY }}
+      STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
+      STRIPE_PAYMENT_LINK_ID: ${{ secrets.STRIPE_PAYMENT_LINK_ID }}
+      STRIPE_PAYMENT_LINK_ID_LIVE: ${{ vars.STRIPE_PAYMENT_LINK_ID_LIVE }}
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASS: ${{ secrets.SMTP_PASS }}
+      SMTP_HOST: ${{ vars.SMTP_HOST }}
+      SMTP_PORT: ${{ vars.SMTP_PORT }}
+      FROM_EMAIL: ${{ vars.FROM_EMAIL }}
+      OWNER_EMAIL: ${{ secrets.OWNER_EMAIL }}
+      HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
+      BUSINESS_NAME: ${{ vars.BUSINESS_NAME }}
+      BUSINESS_ADDRESS: ${{ vars.BUSINESS_ADDRESS }}
+      AUTO_REFUND: ${{ vars.AUTO_REFUND }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Check for orders every 10 minutes
+        run: |
+          for i in $(seq 1 32); do
+            echo "::group::Check $i at $(date -u +%H:%M)"
+            python -m finder.main || echo "Run failed; the owner was alerted. Continuing."
+            echo "::endgroup::"
+            [ "$i" -lt 32 ] && sleep 600
+          done
+      - name: Start the next run
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run poller.yml --ref main
