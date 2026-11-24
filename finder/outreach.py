@@ -34,8 +34,8 @@ SUBJECT = "Free teaming-partner lists for your clients"
 BODY = """Hello,
 
 I run TeamingScout, which publishes free lists of the small businesses winning federal
-contracts in 41 NAICS codes, updated weekly from public USAspending.gov data:
-https://teamingscout.com/industries/
+contracts in more than 80 NAICS codes and every state, updated weekly from public USAspending.gov data:
+https://teamingscout.com/industries/  (by state: https://teamingscout.com/states/)
 
 Each list shows award counts, totals, the main agencies and when current contracts end,
 which can help your clients find teaming partners and subcontractors or spot upcoming

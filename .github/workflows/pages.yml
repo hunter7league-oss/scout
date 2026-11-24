@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: "17 9 * * 1"   # Mondays 09:17 UTC
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["finder/pages.py"]
 
 permissions:
   contents: write

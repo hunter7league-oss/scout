@@ -39,6 +39,49 @@ INDUSTRIES = {
     "541930": "Translation and Interpretation",
     "541990": "Other Professional, Scientific and Technical Services",
     "541380": "Testing Laboratories",
+    "541214": "Payroll Services",
+    "541219": "Other Accounting Services",
+    "541430": "Graphic Design Services",
+    "541820": "Public Relations Agencies",
+    "541910": "Marketing Research and Public Opinion Polling",
+    "541350": "Building Inspection Services",
+    "541340": "Drafting Services",
+    "541614": "Process, Physical Distribution and Logistics Consulting",
+    "541612": "Human Resources Consulting",
+    "541613": "Marketing Consulting",
+    "541211": "Offices of Certified Public Accountants",
+    "561110": "Office Administrative Services",
+    "561410": "Document Preparation Services",
+    "561421": "Telephone Answering Services",
+    "561510": "Travel Agencies",
+    "561621": "Security Systems Services",
+    "561710": "Exterminating and Pest Control Services",
+    "561790": "Other Services to Buildings and Dwellings",
+    "561990": "All Other Support Services",
+    "236115": "New Single-Family Housing Construction",
+    "236118": "Residential Remodelers",
+    "237110": "Water and Sewer Line Construction",
+    "237130": "Power and Communication Line Construction",
+    "238110": "Concrete Foundation and Structure Contractors",
+    "238320": "Painting and Wall Covering Contractors",
+    "238910": "Site Preparation Contractors",
+    "238330": "Flooring Contractors",
+    "238350": "Finish Carpentry Contractors",
+    "484110": "General Freight Trucking, Local",
+    "484121": "General Freight Trucking, Long-Distance",
+    "485991": "Special Needs Transportation",
+    "517810": "All Other Telecommunications",
+    "519290": "Web Search Portals and All Other Information Services",
+    "611420": "Computer Training",
+    "611519": "Other Technical and Trade Schools",
+    "621111": "Offices of Physicians",
+    "621511": "Medical Laboratories",
+    "623110": "Nursing Care Facilities",
+    "811111": "General Automotive Repair",
+    "811210": "Electronic and Precision Equipment Repair",
+    "812332": "Industrial Launderers",
+    "722310": "Food Service Contractors",
+    "541720": "Research and Development in Social Sciences and Humanities",
     "541370": "Surveying and Mapping",
     "541360": "Geophysical Surveying and Mapping",
     "541310": "Architectural Services",
@@ -65,6 +108,17 @@ INDUSTRIES = {
     "493110": "General Warehousing and Storage",
     "811310": "Commercial and Industrial Machinery Repair",
 }
+
+
+STATES = {"AL":"Alabama","AK":"Alaska","AZ":"Arizona","AR":"Arkansas","CA":"California","CO":"Colorado",
+"CT":"Connecticut","DE":"Delaware","DC":"District of Columbia","FL":"Florida","GA":"Georgia","HI":"Hawaii",
+"ID":"Idaho","IL":"Illinois","IN":"Indiana","IA":"Iowa","KS":"Kansas","KY":"Kentucky","LA":"Louisiana",
+"ME":"Maine","MD":"Maryland","MA":"Massachusetts","MI":"Michigan","MN":"Minnesota","MS":"Mississippi",
+"MO":"Missouri","MT":"Montana","NE":"Nebraska","NV":"Nevada","NH":"New Hampshire","NJ":"New Jersey",
+"NM":"New Mexico","NY":"New York","NC":"North Carolina","ND":"North Dakota","OH":"Ohio","OK":"Oklahoma",
+"OR":"Oregon","PA":"Pennsylvania","RI":"Rhode Island","SC":"South Carolina","SD":"South Dakota",
+"TN":"Tennessee","TX":"Texas","UT":"Utah","VT":"Vermont","VA":"Virginia","WA":"Washington",
+"WV":"West Virginia","WI":"Wisconsin","WY":"Wyoming","PR":"Puerto Rico"}
 
 STYLE = """
   :root { --ink:#14202b; --muted:#5b6670; --line:#e3e6e8; --accent:#1f6f5c; --bg:#fbfaf7; }
@@ -139,7 +193,7 @@ Updated {updated}.</p>
 <th>Main agencies</th><th>Latest contract end</th></tr></thead><tbody>{rows}</tbody></table>
 <p class="fine">Award values are obligated amounts reported to USAspending.gov and may include options.
 "Latest contract end" helps spot work that may be recompeted soon.</p>
-<p><a href="/industries/">Browse all industries</a></p>"""
+<p><a href="/industries/">Browse all industries</a> · <a href="/states/">Browse by state</a></p>"""
     return page(f"Top small-business federal contractors: {label} (NAICS {code}) | TeamingScout",
                 f"Small businesses with the most federal contract awards in {label} (NAICS {code}), "
                 f"from USAspending.gov data. Find teaming partners and subcontractors.",
@@ -158,6 +212,48 @@ USAspending.gov data. Updated {updated}.</p>
     return page("Federal teaming partners by industry | TeamingScout",
                 "Free lists of small businesses winning federal contracts, by NAICS industry code.",
                 "/industries/", body)
+
+
+def state_page(code: str, name: str, firms: list[dict], updated: str) -> str:
+    e = html.escape
+    rows = "".join(
+        f"<tr><td>{i}</td><td>{e(f['name'])}"
+        + (f' · <a href="{e(f["profile_url"])}">awards</a>' if f["profile_url"] else "")
+        + f"</td><td class='num'>{f['award_count']}</td><td class='num'>{usaspending_money(f['total'])}</td>"
+        f"<td>{e(', '.join(f['agencies'][:2]) or '—')}</td><td>{e(f['latest_end'] or '—')}</td></tr>"
+        for i, f in enumerate(firms, 1)
+    )
+    cta = f"""<div class="box"><b>Bidding on federal work in {e(name)}?</b><br>
+Get a shortlist built for your bid: firms that have won the same kind of work, filtered to {e(name)} and the
+certification you need, with award history and where to find contacts. Delivered by email in about an hour.<br>
+<a class="cta" href="{BUY}">Get a custom shortlist · $49</a><br>
+<span class="fine">Full refund if we find fewer than 5 firms. <a href="/sample.html">See a sample report</a>.</span></div>"""
+    body = f"""<h1>Small-business federal contractors in {e(name)}</h1>
+<p class="lead">Small businesses behind the largest federal contract awards performed in {e(name)} over the last
+five years, ranked by how many of those awards they won. Use it to find local teaming partners and subcontractors.
+Updated {updated}.</p>
+{cta}
+<table><thead><tr><th>#</th><th>Firm</th><th class="num">Awards</th><th class="num">Total obligated</th>
+<th>Main agencies</th><th>Latest contract end</th></tr></thead><tbody>{rows}</tbody></table>
+<p class="fine">Award values are obligated amounts reported to USAspending.gov and may include options.</p>
+<p><a href="/states/">All states</a> · <a href="/industries/">Browse by industry</a></p>"""
+    return page(f"Small-business federal contractors in {name} | TeamingScout",
+                f"Small businesses winning the largest federal contracts performed in {name}, from USAspending.gov "
+                f"data. Find local teaming partners and subcontractors.",
+                f"/states/{code.lower()}.html", body)
+
+
+def states_index(built: dict[str, str], updated: str) -> str:
+    items = "".join(f'<li><a href="/states/{c.lower()}.html">{html.escape(n)}</a></li>'
+                    for c, n in sorted(built.items(), key=lambda kv: kv[1]))
+    body = f"""<h1>Find federal teaming partners by state</h1>
+<p class="lead">Free lists of small businesses winning large federal contracts in each state, from public
+USAspending.gov data. Updated {updated}.</p>
+<ul class="cols">{items}</ul>
+<div class="box">Need partners for a specific bid and certification?
+<a class="cta" href="{BUY}">Get a custom shortlist · $49</a></div>"""
+    return page("Federal teaming partners by state | TeamingScout",
+                "Free lists of small businesses winning federal contracts, by state.", "/states/", body)
 
 
 def ping_indexnow(urls: list[str]) -> None:
@@ -193,8 +289,28 @@ def main() -> None:
     with open("docs/industries/index.html", "w", encoding="utf-8") as fh:
         fh.write(index_page(built, updated))
 
+    os.makedirs("docs/states", exist_ok=True)
+    built_states: dict[str, str] = {}
+    for code, name in STATES.items():
+        try:
+            rows = usaspending.search_awards([], code, "small_business", max_pages=2)
+            firms = usaspending.rank_firms(rows, top=15)
+        except Exception as exc:
+            print(f"[warn] state {code}: {exc}")
+            continue
+        if len(firms) < 5:
+            continue
+        with open(f"docs/states/{code.lower()}.html", "w", encoding="utf-8") as fh:
+            fh.write(state_page(code, name, firms, updated))
+        built_states[code] = name
+        print(f"built state {code}")
+        time.sleep(1)
+    with open("docs/states/index.html", "w", encoding="utf-8") as fh:
+        fh.write(states_index(built_states, updated))
+
     urls = [f"{SITE}/", f"{SITE}/sample.html", f"{SITE}/industries/"] + \
-           [f"{SITE}/industries/{c}.html" for c in built]
+           [f"{SITE}/industries/{c}.html" for c in built] + [f"{SITE}/states/"] + \
+           [f"{SITE}/states/{c.lower()}.html" for c in built_states]
     today = dt.date.today().isoformat()
     with open("docs/sitemap.xml", "w", encoding="utf-8") as fh:
         fh.write('<?xml version="1.0" encoding="UTF-8"?>\n'

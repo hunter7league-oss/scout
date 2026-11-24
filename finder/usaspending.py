@@ -54,12 +54,13 @@ def search_awards(naics: list[str], state: str | None, certification: str | None
     today = dt.date.today()
     filters: dict = {
         "award_type_codes": CONTRACT_TYPES,
-        "naics_codes": {"require": naics},
         "time_period": [{
             "start_date": (today - dt.timedelta(days=365 * years)).isoformat(),
             "end_date": today.isoformat(),
         }],
     }
+    if naics:
+        filters["naics_codes"] = {"require": naics}
     if state:
         filters["place_of_performance_locations"] = [{"country": "USA", "state": state}]
     if certification:
