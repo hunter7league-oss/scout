@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: "23 15 * * 1-5"   # weekdays ~10:23 a.m. Eastern
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["outreach/contacts.csv"]   # new contacts start a batch right away (still capped daily)
 
 permissions:
   contents: write

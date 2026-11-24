@@ -106,7 +106,8 @@ def main() -> None:
     with open(CONTACTS, encoding="utf-8") as fh:
         contacts = [r for r in csv.DictReader(fh)
                     if r["email"].lower() not in already and r["email"].lower() not in suppressed]
-    batch = contacts[:DAILY_LIMIT]
+    sent_today = sum(1 for r in sent_rows if r.get("date") == dt.date.today().isoformat())
+    batch = contacts[:max(0, DAILY_LIMIT - sent_today)]
     if not batch:
         print("Nothing left to send.")
         return
