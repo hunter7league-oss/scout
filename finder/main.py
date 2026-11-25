@@ -175,6 +175,10 @@ def process_orders() -> int:
                 alert_owner("Order below 5 firms: refund or follow up",
                             f"Order {s['id']} ({order}) found {n} firms. Notes: {notes}")
             handled += 1
+        except smtplib.SMTPAuthenticationError:
+            # Mailbox login is broken (password changed or account locked). Don't burn retry
+            # attempts: keep the order queued until email works again (looked back 7 days).
+            print(f"[warn] email login failing; order {s['id']} stays queued")
         except Exception:
             stripe.PaymentIntent.modify(pi["id"], metadata={"report_attempts": str(attempts + 1)})
             alert_owner("Order failed, will retry", f"Order {s['id']}\n{traceback.format_exc()}")
