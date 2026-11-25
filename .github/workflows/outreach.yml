@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["outreach/contacts.csv"]   # new contacts start a batch right away (still capped daily)
+    paths: ["outreach/contacts.csv", "finder/outreach.py"]   # new contacts start a batch right away (still capped daily)
 
 permissions:
   contents: write

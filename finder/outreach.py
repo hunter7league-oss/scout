@@ -71,18 +71,22 @@ def update_suppression() -> set[str]:
     _, ids = box.search(None, f'(SINCE "{since}")')
     new = set()
     for mid in ids[0].split():
-        _, data = box.fetch(mid, "(RFC822)")
-        msg = email.message_from_bytes(data[0][1])
-        sender = email.utils.parseaddr(msg.get("From", ""))[1].lower()
-        text = msg.get("Subject", "")
-        for part in msg.walk():
-            if part.get_content_type() == "text/plain":
-                try:
-                    text += " " + part.get_payload(decode=True).decode(errors="ignore")[:2000]
-                except Exception:
-                    pass
-        if sender and OPT_OUT_WORDS.search(text):
-            new.add(sender)
+        try:
+            _, data = box.fetch(mid, "(RFC822)")
+            raw = next((x[1] for x in data if isinstance(x, tuple)), None)
+            if not raw:
+                continue
+            msg = email.message_from_bytes(raw)
+            sender = email.utils.parseaddr(str(msg.get("From", "")))[1].lower()
+            text = str(msg.get("Subject", ""))
+            for part in msg.walk():
+                if part.get_content_type() == "text/plain":
+                    payload = part.get_payload(decode=True) or b""
+                    text += " " + payload.decode(errors="ignore")[:2000]
+            if sender and OPT_OUT_WORDS.search(text):
+                new.add(sender)
+        except Exception as exc:
+            print(f"[warn] skipped one inbox message: {type(exc).__name__}")
     box.logout()
     if new - suppressed:
         with open(SUPPRESSED, "a", encoding="utf-8") as fh:
@@ -137,9 +141,24 @@ def main() -> None:
                 print(f"sent: {c['office']} ({c['state']})")
             except smtplib.SMTPRecipientsRefused:
                 print(f"refused: {c['email']}")
+            except smtplib.SMTPException as exc:
+                print(f"[warn] send failed for {c['email']}: {type(exc).__name__}: {str(exc)[:200]}")
+                if isinstance(exc, (smtplib.SMTPServerDisconnected, smtplib.SMTPDataError)):
+                    break  # stop for today rather than hammer the server
             time.sleep(20)  # spread sends out
     print(f"Sent {len(batch)} today; {len(contacts) - len(batch)} remaining.")
 
 
 if __name__ == "__main__":
-    main()
+    import traceback
+    os.makedirs("outreach", exist_ok=True)
+    try:
+        main()
+        status = "ok"
+    except BaseException:
+        status = traceback.format_exc()[-3000:]
+    with open("outreach/last_run.txt", "w", encoding="utf-8") as fh:
+        fh.write(f"{dt.datetime.utcnow().isoformat()}Z\n{status}\n")
+    if status != "ok":
+        print(status)
+        raise SystemExit(1)
