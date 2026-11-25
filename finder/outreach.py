@@ -157,8 +157,17 @@ if __name__ == "__main__":
         status = "ok"
     except BaseException:
         status = traceback.format_exc()[-3000:]
+    smtp_check = "not checked"
+    if status != "ok":
+        try:
+            with smtplib.SMTP_SSL(os.environ.get("SMTP_HOST") or "smtp.ionos.com",
+                                  int(os.environ.get("SMTP_PORT") or "465"), timeout=30) as s:
+                s.login(os.environ["SMTP_USER"], os.environ["SMTP_PASS"])
+            smtp_check = "SMTP login OK"
+        except Exception as exc:
+            smtp_check = f"SMTP login FAILED: {type(exc).__name__}: {str(exc)[:200]}"
     with open("outreach/last_run.txt", "w", encoding="utf-8") as fh:
-        fh.write(f"{dt.datetime.utcnow().isoformat()}Z\n{status}\n")
+        fh.write(f"{dt.datetime.utcnow().isoformat()}Z\n{status}\n{smtp_check}\n")
     if status != "ok":
         print(status)
         raise SystemExit(1)
