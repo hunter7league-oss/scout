@@ -1,0 +1,13 @@
+2026-11-25T00:12:43.921859Z
+Traceback (most recent call last):
+  File "/home/runner/work/scout/scout/finder/outreach.py", line 156, in <module>
+    main()
+  File "/home/runner/work/scout/scout/finder/outreach.py", line 103, in main
+    suppressed = update_suppression()
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/scout/scout/finder/outreach.py", line 68, in update_suppression
+    box.login(os.environ["SMTP_USER"], os.environ["SMTP_PASS"])
+  File "/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/imaplib.py", line 621, in login
+    raise self.error(dat[-1])
+imaplib.IMAP4.error: b'authentication failed'
+
