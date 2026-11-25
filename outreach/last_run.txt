@@ -1,4 +1,4 @@
-2026-11-25T00:12:43.921859Z
+2026-11-25T00:13:30.073492Z
 Traceback (most recent call last):
   File "/home/runner/work/scout/scout/finder/outreach.py", line 156, in <module>
     main()
@@ -11,3 +11,4 @@ Traceback (most recent call last):
     raise self.error(dat[-1])
 imaplib.IMAP4.error: b'authentication failed'
 
+SMTP login FAILED: SMTPAuthenticationError: (535, b'Authentication credentials invalid')
